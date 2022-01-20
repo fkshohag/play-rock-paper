@@ -1,0 +1,44 @@
+version: "3.5"
+services:
+  backend:
+    container_name: rock_app
+    working_dir: /var/www/rock-backend
+    build:
+      context: .
+    volumes:
+      - .:/var/www/rock-backend
+      - /var/www/rock-backend/node_modules
+    ports:
+      - 8012:3001
+    networks:
+      - rocknet
+    depends_on:
+      - db
+
+  db:
+    image: postgres:11.5-alpine
+    container_name: rock_postgres
+    networks:
+      - rocknet
+    volumes:
+      - ./db_store:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=rockadmin
+      - POSTGRES_PASSWORD=rock^back@lik
+      - POSTGRES_DB=rock
+    ports:
+      - 5432:5432
+
+  db_client:
+    image: adminer
+    container_name: rock_adminer
+    ports:
+      - 8013:8080
+    depends_on:
+      - db
+    networks:
+      - rocknet
+
+networks:
+  rocknet:
+    driver: bridge
